@@ -124,6 +124,7 @@
   }
 
   function LoginRegisterInput(props, events = {}) {
+    const assetBase = "../mvp-assets/components/LoginRegisterInput/assets/";
     const type = props.type || props.defaultType || "文本-默认";
     const isPhone = type.startsWith("电话");
     const isPassword = type.startsWith("密码");
@@ -138,9 +139,31 @@
       const wrapper = el("div", "fd-login-register-code");
       const grid = el("div", "fd-login-register-code-grid");
       const digits = value.slice(0, 4).split("");
+      const native = document.createElement("input");
+      native.className = "fd-login-register-code-native";
+      native.inputMode = "numeric";
+      native.maxLength = 4;
+      native.value = value;
+      native.addEventListener("click", (event) => event.stopPropagation());
+      native.addEventListener("pointerdown", (event) => event.stopPropagation());
+      native.addEventListener("input", (event) => {
+        event.stopPropagation();
+        event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+        events.onInput?.(event);
+        const nextDigits = event.target.value.split("");
+        grid.querySelectorAll(".fd-login-register-code-cell").forEach((cell, index) => {
+          cell.textContent = nextDigits[index] || "";
+          cell.classList.toggle("active", !isError && index === Math.min(nextDigits.length, 3));
+        });
+      });
+      grid.append(native);
       Array.from({ length: 4 }, (_, index) => {
         const cell = el("span", `fd-login-register-code-cell ${isError ? "error" : index === digits.length ? "active" : ""}`, digits[index] || "");
         grid.append(cell);
+      });
+      grid.addEventListener("click", (event) => {
+        event.stopPropagation();
+        native.focus();
       });
       wrapper.append(grid);
       const feedback = el("div", "fd-login-register-feedback");
@@ -157,6 +180,11 @@
 
     if (isPhone) {
       input.append(el("span", "fd-login-register-country", props.countryCode || "+86"));
+      const arrow = document.createElement("img");
+      arrow.className = "fd-login-register-arrow";
+      arrow.alt = "";
+      arrow.src = `${assetBase}arrow-down-small.svg`;
+      input.append(arrow);
       input.append(el("span", "fd-login-register-divider"));
     }
 
@@ -167,14 +195,28 @@
     field.maxLength = isPhone ? 11 : props.maxLength || 120;
     field.type = isPassword && !isVisible ? "password" : "text";
     field.addEventListener("click", (event) => event.stopPropagation());
+    field.addEventListener("pointerdown", (event) => event.stopPropagation());
+    field.addEventListener("focus", (event) => event.stopPropagation());
     field.addEventListener("input", (event) => {
       event.stopPropagation();
       events.onInput?.(event);
     });
     input.append(field);
 
-    if (isEditing) input.append(el("span", "fd-login-register-icon", "×"));
-    if (isPassword) input.append(el("span", "fd-login-register-icon", isVisible ? "◉" : "◌"));
+    if (isEditing) {
+      const close = document.createElement("img");
+      close.className = "fd-login-register-icon";
+      close.alt = "";
+      close.src = `${assetBase}close.svg`;
+      input.append(close);
+    }
+    if (isPassword) {
+      const visible = document.createElement("img");
+      visible.className = "fd-login-register-icon";
+      visible.alt = "";
+      visible.src = `${assetBase}${isVisible ? "password-visible.svg" : "password-hidden.svg"}`;
+      input.append(visible);
+    }
     return input;
   }
 
@@ -253,7 +295,6 @@
     phoneScreen.append(status);
 
     const page = el("div", "ds-phone-page");
-    if (screens.length > 1) page.append(FlowNav({ screens, activeScreenId, onActivate }));
     children.forEach((child) => page.append(child));
     phoneScreen.append(page);
     phone.append(phoneScreen);
@@ -271,7 +312,7 @@
   }
 
   function CanvasNode({ node, selected, onSelect, child }) {
-    const wrapper = el("section", `ds-canvas-node ${selected ? "selected" : ""}`);
+    const wrapper = el("section", `ds-canvas-node component-${node.component} ${selected ? "selected" : ""}`);
     wrapper.dataset.label = `${node.component}${node.variant ? ` / ${node.variant}` : ""}`;
     wrapper.addEventListener("click", onSelect);
     wrapper.append(child);

@@ -177,7 +177,7 @@
                   event.target.value = state.phoneNumber;
                   node.props.type = state.phoneNumber ? "电话-输入中" : "电话-默认";
                 } else {
-                  node.props.value = event.target.value;
+                  node.props.value = event.target.value.replace(/\D/g, "").slice(0, 4);
                 }
                 renderJson();
                 document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
@@ -244,7 +244,6 @@
             id: "screen-code",
             name: "02 验证码",
             nodes: [
-              { id: "code-1", component: "Heading", variant: "NoArrow", props: { title: "输入验证码" } },
               { id: "code-2", component: "HeroText", props: { title: "验证手机号", subtitle: "验证码已发送至 138****8888" } },
               { id: "code-3", component: "LoginRegisterInput", variant: "验证码", props: { type: "验证码", value: "", resendLabel: "重新发送（57秒）", resendDisabled: true } },
               { id: "code-4", component: "Button", props: { text: "登录 / 注册", nextScreenId: "screen-profile" } }
@@ -254,7 +253,7 @@
             id: "screen-profile",
             name: "03 完善信息",
             nodes: [
-              { id: "profile-1", component: "Heading", variant: "DescriptionOnly", props: { title: "完善资料", description: "设置昵称后即可完成注册" } },
+              { id: "profile-1", component: "HeroText", props: { title: "完善资料", subtitle: "设置昵称后即可完成注册" } },
               { id: "profile-2", component: "LoginRegisterInput", variant: "文本-默认", props: { defaultType: "文本-默认", placeholder: "请输入昵称" } },
               { id: "profile-3", component: "LoginRegisterInput", variant: "文本-默认", props: { defaultType: "文本-默认", placeholder: "选择感兴趣的市场" } },
               { id: "profile-4", component: "Button", props: { text: "完成注册", nextScreenId: "screen-success" } }
@@ -392,15 +391,6 @@
         canvasInner.style.transform = `scale(${state.zoom})`;
         const screens = state.screens;
 
-        if (state.screens.length > 1) {
-          canvasInner.append(C.FlowStrip({
-            screens: state.screens,
-            steps: state.flowSteps,
-            activeScreenId: state.activeScreenId,
-            onActivate: activateScreen
-          }));
-        }
-
         const screen = activeScreen();
         canvasInner.append(C.PhonePrototype({
           screen,
@@ -412,13 +402,6 @@
 
         screens.forEach((screen, screenIndex) => {
           const children = [];
-          if (state.screens.length > 1) {
-            children.push(C.FlowNav({
-              screens: state.screens,
-              activeScreenId: screen.id,
-              onActivate: activateScreen
-            }));
-          }
           screen.nodes.forEach((node, index) => {
             children.push(canvasNode(node, screen));
             if (state.screens.length === 1 && (index === 1 || index === 2)) {
