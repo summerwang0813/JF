@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OJO-like AI Component Workbench</title>
+    <link rel="stylesheet" href="./ojo-design-system.css" />
+  </head>
+  <body>
+    <main class="ds-workspace">
+      <header class="ds-topbar">
+        <div class="ds-brand">
+          <div class="ds-brand-mark" aria-hidden="true"></div>
+          <div class="ds-brand-title">AI Component Canvas</div>
+        </div>
+        <div class="ds-top-actions">
+          <div class="ds-theme-switch" aria-label="主题切换">
+            <button class="ds-theme-option active" id="lightThemeButton" type="button">白</button>
+            <button class="ds-theme-option" id="darkThemeButton" type="button">黑</button>
+          </div>
+          <button class="ds-icon-button tool-text" id="selectModeTop" title="选择组件">选择</button>
+          <button class="ds-icon-button tool-text" id="panModeTop" title="拖动画布，再点一次返回选择">拖动</button>
+          <button class="ds-icon-button tool-text" id="fitViewTop" title="定位到内容">定位</button>
+          <span class="ds-zoom-pill" id="zoomLabelTop">100%</span>
+        </div>
+      </header>
+
+      <aside class="ds-panel ds-panel-left">
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">AI Prompt</h2>
+          <div class="ds-stack" id="aiThread">
+            <div class="ds-message assistant">输入页面需求，我会先梳理流程，再用组件库生成可演示手机和页面全览。</div>
+          </div>
+        </section>
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">Design Spec</h2>
+          <div class="ds-stack">
+            <div class="ds-spec-card">默认白色工作台，支持黑色反色。</div>
+            <div class="ds-spec-card">手机内 App 页面保持白底业务规范。</div>
+            <div class="ds-spec-card">页面由组件库和 DSL 组合，不直接手写界面。</div>
+          </div>
+        </section>
+        <section class="ds-panel-section">
+          <div class="ds-stack">
+            <textarea class="ds-prompt" id="promptInput">我需要手机号登录一整个流程</textarea>
+            <button class="ds-primary-button" id="generateButton" type="button">生成页面</button>
+            <button class="ds-chip" type="button">我需要手机号登录一整个流程</button>
+            <button class="ds-chip" type="button">生成一个会员权益页面，包含 VIP 标题和说明</button>
+            <button class="ds-chip" type="button">生成一个直播页面，右侧显示直播日历</button>
+            <button class="ds-chip" type="button">生成一个港股资讯页面，标题后显示 HK 标签</button>
+          </div>
+        </section>
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">AI Flow</h2>
+          <div class="ds-stack" id="flowList"></div>
+        </section>
+      </aside>
+
+      <section class="ds-canvas" id="canvasViewport" aria-label="无限画布工作区">
+        <div class="ds-toolbar">
+          <span class="ds-toolbar-label">画布工具</span>
+          <button class="ds-tool-button tool-text active" id="selectModeButton" title="选择组件">选择</button>
+          <button class="ds-tool-button tool-text" id="panModeButton" title="拖动画布，再点一次返回选择">拖动</button>
+          <button class="ds-tool-button tool-text" id="zoomOutButton" title="缩小">缩小</button>
+          <button class="ds-tool-button tool-text" id="zoomInButton" title="放大">放大</button>
+          <button class="ds-tool-button tool-text" id="fitViewButton" title="定位到内容">定位</button>
+          <span class="ds-zoom-pill" id="toolHint">当前：选择</span>
+          <span class="ds-zoom-pill" id="zoomLabel">100%</span>
+        </div>
+        <div class="ds-canvas-inner" id="canvasInner"></div>
+      </section>
+
+      <aside class="ds-panel ds-panel-right">
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">Component Library</h2>
+          <div id="variantList"></div>
+        </section>
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">Inspector</h2>
+          <div class="ds-field">
+            <label for="variantSelect">Variant</label>
+            <select id="variantSelect"></select>
+          </div>
+          <div class="ds-field">
+            <label for="titleInput">Title / Text / Placeholder</label>
+            <input id="titleInput" />
+          </div>
+          <div class="ds-field">
+            <label for="descriptionInput">Description</label>
+            <input id="descriptionInput" />
+          </div>
+          <div class="ds-field">
+            <label for="rightTextInput">Right Text</label>
+            <input id="rightTextInput" />
+          </div>
+        </section>
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">AI JSON</h2>
+          <pre class="ds-json-view" id="jsonView"></pre>
+        </section>
+        <section class="ds-panel-section">
+          <h2 class="ds-panel-title">Layers</h2>
+          <div id="layerList"></div>
+        </section>
+      </aside>
+    </main>
+
+    <script src="./ojo-component-library.js"></script>
+    <script>
+      const C = window.OJOComponents;
+      const state = {
+        theme: "light",
+        tool: "select",
+        zoom: 1,
+        mode: "page",
+        selectedId: "node-1",
+        activeScreenId: "screen-page",
+        phoneNumber: "",
+        flowSteps: [
+          { title: "1. 首页生成", description: "根据 prompt 生成一个移动端页面" }
+        ],
+        screens: [
+          {
+            id: "screen-page",
+            name: "01 金融首页",
+            nodes: [
+              { id: "node-1", component: "Heading", variant: "Default", props: { title: "自选行情" } },
+              { id: "node-2", component: "Heading", variant: "TagWithDescription", props: { title: "会员权益", description: "根据等级展示专属服务" } },
+              { id: "node-3", component: "Heading", variant: "RightText", props: { title: "投教直播", rightText: "直播日历" } },
+              { id: "node-4", component: "Heading", variant: "MarketTag", props: { title: "港股资讯" } }
+            ]
+          }
+        ]
+      };
+
+      function allNodes() {
+        return state.screens.flatMap((screen) => screen.nodes);
+      }
+
+      function selectedNode() {
+        return allNodes().find((node) => node.id === state.selectedId);
+      }
+
+      function mergedProps(node) {
+        if (node.component !== "Heading") return node.props;
+        return { ...C.headingVariants[node.variant].props, ...node.props };
+      }
+
+      function isPhoneValid() {
+        return /^1\d{10}$/.test(state.phoneNumber);
+      }
+
+      function activateScreen(screenId) {
+        state.activeScreenId = screenId;
+        const screen = state.screens?.find((item) => item.id === screenId);
+        if (screen) state.selectedId = screen.nodes[0].id;
+        render();
+      }
+
+      function renderNodeBlock(node) {
+        if (node.component === "Heading") return C.Heading(mergedProps(node));
+        if (node.component === "HeroText") return C.HeroText(node.props);
+        if (node.component === "Input") {
+          return C.AppInput(
+            { ...node.props, value: node.props.inputType === "phone" ? state.phoneNumber : "" },
+            {
+              onInput: (event) => {
+                state.phoneNumber = event.target.value.replace(/\D/g, "").slice(0, 11);
+                event.target.value = state.phoneNumber;
+                renderJson();
+                document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
+                  button.classList.toggle("disabled", !isPhoneValid());
+                });
+              }
+            }
+          );
+        }
+        if (node.component === "Button") {
+          return C.AppButton(
+            { ...node.props, disabled: Boolean(node.props.requiresPhone && !isPhoneValid()) },
+            {
+              onClick: () => {
+                if (node.props.requiresPhone && !isPhoneValid()) return;
+                if (node.props.nextScreenId) activateScreen(node.props.nextScreenId);
+              }
+            }
+          );
+        }
+        if (node.component === "Agreement") return C.Agreement(node.props);
+        if (node.component === "StatusPanel") return C.StatusPanel(node.props);
+        return C.el("div", "fd-mock-card", node.component);
+      }
+
+      function canvasNode(node, screen) {
+        return C.CanvasNode({
+          node,
+          selected: node.id === state.selectedId,
+          onSelect: () => {
+            state.selectedId = node.id;
+            if (screen) state.activeScreenId = screen.id;
+            render();
+          },
+          child: renderNodeBlock(node)
+        });
+      }
+
+      function activeScreen() {
+        if (!state.screens) return null;
+        return state.screens.find((screen) => screen.id === state.activeScreenId) || state.screens[0];
+      }
+
+      function buildPhoneLoginFlow(prompt) {
+        state.mode = "flow";
+        state.flowSteps = [
+          { title: "1. 进入登录注册", description: "输入手机号，同意协议，点击获取验证码" },
+          { title: "2. 短信验证码校验", description: "输入 6 位验证码，支持重新发送和更换手机号" },
+          { title: "3. 新用户完善信息", description: "设置昵称和关注市场" },
+          { title: "4. 登录成功", description: "展示成功状态并进入首页" }
+        ];
+        state.screens = [
+          {
+            id: "screen-phone",
+            name: "01 手机号登录",
+            nodes: [
+              { id: "login-1", component: "HeroText", props: { title: "手机号登录", subtitle: "未注册手机号验证后将自动创建账号" } },
+              { id: "login-2", component: "Input", props: { placeholder: "请输入手机号", inputType: "phone" } },
+              { id: "login-3", component: "Button", props: { text: "获取验证码", requiresPhone: true, nextScreenId: "screen-code" } },
+              { id: "login-4", component: "Agreement", props: { text: "登录即代表同意《用户协议》和《隐私政策》" } }
+            ]
+          },
+          {
+            id: "screen-code",
+            name: "02 验证码",
+            nodes: [
+              { id: "code-1", component: "Heading", variant: "NoArrow", props: { title: "输入验证码" } },
+              { id: "code-2", component: "HeroText", props: { title: "验证手机号", subtitle: "验证码已发送至 138****8888" } },
+              { id: "code-3", component: "Input", props: { placeholder: "请输入 6 位验证码", action: "重新发送" } },
+              { id: "code-4", component: "Button", props: { text: "登录 / 注册", nextScreenId: "screen-profile" } }
+            ]
+          },
+          {
+            id: "screen-profile",
+            name: "03 完善信息",
+            nodes: [
+              { id: "profile-1", component: "Heading", variant: "DescriptionOnly", props: { title: "完善资料", description: "设置昵称后即可完成注册" } },
+              { id: "profile-2", component: "Input", props: { placeholder: "请输入昵称" } },
+              { id: "profile-3", component: "Input", props: { placeholder: "选择感兴趣的市场", action: "沪深 / 港股" } },
+              { id: "profile-4", component: "Button", props: { text: "完成注册", nextScreenId: "screen-success" } }
+            ]
+          },
+          {
+            id: "screen-success",
+            name: "04 登录成功",
+            nodes: [
+              { id: "success-1", component: "Heading", variant: "TagWithDescription", props: { title: "欢迎回来", description: "已为你同步自选股与会员权益" } },
+              { id: "success-2", component: "StatusPanel", props: { title: "登录成功", description: "接下来进入首页，也可以继续查看新手引导。" } },
+              { id: "success-3", component: "Button", props: { text: "进入首页" } }
+            ]
+          }
+        ];
+        state.nodes = [];
+        state.activeScreenId = state.screens[0].id;
+        state.phoneNumber = "";
+        state.selectedId = state.screens[0].nodes[0].id;
+        appendMessage("user", prompt);
+        appendMessage("assistant", "已先梳理手机号登录注册流程，再用组件库生成手机原型和页面全览。");
+        render();
+      }
+
+      function buildPageFromPrompt(prompt) {
+        const text = prompt.trim() || "生成一个金融首页";
+        if (/登录|注册|手机号|验证码|短信/.test(text)) {
+          buildPhoneLoginFlow(text);
+          return;
+        }
+
+        const nodes = [];
+        let id = 1;
+        const add = (variant, props) => nodes.push({ id: `node-${id++}`, component: "Heading", variant, props });
+        if (/会员|VIP|权益|等级/.test(text)) add("TagWithDescription", { title: "会员权益", description: "根据等级展示专属服务" });
+        if (/直播|日历|课程|投教/.test(text)) add("RightText", { title: "投教直播", rightText: "直播日历" });
+        if (/港股|HK|市场|资讯/.test(text)) add("MarketTag", { title: "港股资讯" });
+        if (/说明|描述|介绍|摘要/.test(text)) add("DescriptionOnly", { title: "市场解读", description: "AI 汇总重点行情和机会线索" });
+        if (/无箭头|静态|纯标题/.test(text)) add("NoArrow", { title: "今日概览" });
+        if (nodes.length === 0 || /首页|金融|行情|自选/.test(text)) {
+          add("Default", { title: "自选行情" });
+          add("DescriptionOnly", { title: "市场机会", description: "AI 发现异动板块和高关注标的" });
+        }
+
+        state.screens = [{
+          id: "screen-page",
+          name: "01 生成页面",
+          nodes
+        }];
+        state.mode = "page";
+        state.activeScreenId = "screen-page";
+        state.flowSteps = [
+          { title: "理解需求", description: "识别为单页面内容生成" },
+          { title: "匹配组件", description: "从 Heading 组件变体中选择合适模块" },
+          { title: "生成画布", description: "输出 pageDsl 并渲染到 Frame" }
+        ];
+        state.selectedId = nodes[0].id;
+        appendMessage("user", text);
+        appendMessage("assistant", `已生成 ${nodes.length} 个 Heading 实例。`);
+        render();
+      }
+
+      function appendMessage(role, text) {
+        const thread = document.querySelector("#aiThread");
+        thread.append(C.el("div", `ds-message ${role}`, text));
+        thread.scrollTop = thread.scrollHeight;
+      }
+
+      function applyVariantToSelected(variantName) {
+        const current = selectedNode();
+        if (!current || current.component !== "Heading") return;
+        current.variant = variantName;
+        current.props = { title: current.props.title || C.headingVariants[variantName].props.title };
+        render();
+      }
+
+      function renderVariantList() {
+        const list = document.querySelector("#variantList");
+        const current = selectedNode();
+        list.innerHTML = "";
+        Object.values(C.headingVariants).forEach((variant) => {
+          list.append(C.ComponentCard({
+            variant,
+            active: current && current.component === "Heading" && current.variant === variant.name,
+            preview: C.Heading(variant.props),
+            onClick: () => applyVariantToSelected(variant.name)
+          }));
+        });
+      }
+
+      function renderLayers() {
+        const layerList = document.querySelector("#layerList");
+        layerList.innerHTML = "";
+        state.screens.forEach((screen) => {
+          layerList.append(C.el("div", "ds-flow-desc", screen.name));
+          screen.nodes.forEach((node) => {
+            layerList.append(C.LayerItem({
+              label: `${node.component}${node.variant ? ` / ${node.variant}` : ""}`,
+              active: node.id === state.selectedId,
+              onClick: () => {
+                state.selectedId = node.id;
+                if (state.screens) state.activeScreenId = screen.id;
+                render();
+              }
+            }));
+          });
+        });
+      }
+
+      function renderCanvas() {
+        const canvasInner = document.querySelector("#canvasInner");
+        canvasInner.innerHTML = "";
+        canvasInner.classList.toggle("flow-mode", state.screens.length > 1);
+        canvasInner.style.transform = `scale(${state.zoom})`;
+        const screens = state.screens;
+
+        if (state.screens.length > 1) {
+          canvasInner.append(C.FlowStrip({
+            screens: state.screens,
+            steps: state.flowSteps,
+            activeScreenId: state.activeScreenId,
+            onActivate: activateScreen
+          }));
+        }
+
+        const screen = activeScreen();
+        canvasInner.append(C.PhonePrototype({
+          screen,
+          screens: state.screens,
+          activeScreenId: state.activeScreenId,
+          onActivate: activateScreen,
+          children: screen.nodes.map((node) => canvasNode(node, screen))
+        }));
+
+        screens.forEach((screen, screenIndex) => {
+          const children = [];
+          if (state.screens.length > 1) {
+            children.push(C.FlowNav({
+              screens: state.screens,
+              activeScreenId: screen.id,
+              onActivate: activateScreen
+            }));
+          }
+          screen.nodes.forEach((node, index) => {
+            children.push(canvasNode(node, screen));
+            if (state.screens.length === 1 && (index === 1 || index === 2)) {
+              children.push(C.MockCard(index === 1 ? [["专属解读", "+3 条"], ["服务等级", "V0白银"]] : [["今日直播", "09:30"], ["策略复盘", "15:00"]]));
+            }
+          });
+
+          canvasInner.append(C.ScreenBoard({
+            screen,
+            active: screen.id === state.activeScreenId,
+            left: state.screens.length > 1 ? 560 + screenIndex * 410 : 560,
+            children
+          }));
+        });
+
+        updateZoomLabels();
+      }
+
+      function renderInspector() {
+        const node = selectedNode();
+        const props = mergedProps(node);
+        const variantSelect = document.querySelector("#variantSelect");
+        variantSelect.innerHTML = "";
+        Object.keys(C.headingVariants).forEach((name) => {
+          const option = C.el("option", "", name);
+          option.value = name;
+          option.selected = name === node.variant;
+          variantSelect.append(option);
+        });
+        variantSelect.disabled = node.component !== "Heading";
+        document.querySelector("#titleInput").value = props.title || props.text || props.placeholder || "";
+        document.querySelector("#descriptionInput").value = props.description || "";
+        document.querySelector("#rightTextInput").value = props.rightText || "";
+        renderJson();
+      }
+
+      function renderFlowList() {
+        const flowList = document.querySelector("#flowList");
+        flowList.innerHTML = "";
+        state.flowSteps.forEach((step) => {
+          const item = C.el("div", "ds-flow-card");
+          item.append(C.el("strong", "", step.title));
+          item.append(C.el("span", "", step.description));
+          flowList.append(item);
+        });
+      }
+
+      function renderJson() {
+        const node = selectedNode();
+        document.querySelector("#jsonView").textContent = JSON.stringify({
+          selected: {
+            component: node.component,
+            variant: node.variant,
+            figmaNodeId: node.variant ? C.headingVariants[node.variant].figmaNodeId : undefined,
+            props: node.props
+          },
+          flow: state.flowSteps,
+          pageDsl: state.screens
+            ? state.screens.map((screen) => ({
+                screen: screen.name,
+                nodes: screen.nodes.map((item) => ({
+                  component: item.component,
+                  variant: item.variant,
+                  props: item.props
+                }))
+              }))
+            : []
+        }, null, 2);
+      }
+
+      function setTheme(theme) {
+        state.theme = theme;
+        document.documentElement.dataset.theme = theme;
+        document.querySelector("#lightThemeButton").classList.toggle("active", theme === "light");
+        document.querySelector("#darkThemeButton").classList.toggle("active", theme === "dark");
+      }
+
+      function setTool(tool) {
+        state.tool = tool;
+        document.querySelector("#selectModeButton").classList.toggle("active", tool === "select");
+        document.querySelector("#panModeButton").classList.toggle("active", tool === "pan");
+        document.querySelector("#selectModeTop").classList.toggle("active", tool === "select");
+        document.querySelector("#panModeTop").classList.toggle("active", tool === "pan");
+        document.querySelector("#canvasViewport").classList.toggle("grabbing", tool === "pan");
+        document.querySelector("#toolHint").textContent = tool === "pan"
+          ? "当前：拖动，再点拖动或按 Esc 返回"
+          : "当前：选择";
+      }
+
+      function setZoom(zoom) {
+        state.zoom = Math.min(1.4, Math.max(0.45, zoom));
+        document.querySelector("#canvasInner").style.transform = `scale(${state.zoom})`;
+        updateZoomLabels();
+      }
+
+      function updateZoomLabels() {
+        const text = `${Math.round(state.zoom * 100)}%`;
+        document.querySelector("#zoomLabel").textContent = text;
+        document.querySelector("#zoomLabelTop").textContent = text;
+      }
+
+      function fitView() {
+        const viewport = document.querySelector("#canvasViewport");
+        setZoom(0.72);
+        requestAnimationFrame(() => {
+          viewport.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+        });
+      }
+
+      function bindCanvasControls() {
+        const viewport = document.querySelector("#canvasViewport");
+        const togglePan = () => setTool(state.tool === "pan" ? "select" : "pan");
+        document.querySelector("#selectModeButton").addEventListener("click", () => setTool("select"));
+        document.querySelector("#panModeButton").addEventListener("click", togglePan);
+        document.querySelector("#selectModeTop").addEventListener("click", () => setTool("select"));
+        document.querySelector("#panModeTop").addEventListener("click", togglePan);
+        document.querySelector("#zoomOutButton").addEventListener("click", () => setZoom(state.zoom - 0.1));
+        document.querySelector("#zoomInButton").addEventListener("click", () => setZoom(state.zoom + 0.1));
+        document.querySelector("#fitViewButton").addEventListener("click", fitView);
+        document.querySelector("#fitViewTop").addEventListener("click", fitView);
+
+        window.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") setTool("select");
+        });
+
+        viewport.addEventListener("wheel", (event) => {
+          if (!event.ctrlKey && !event.metaKey) return;
+          event.preventDefault();
+          setZoom(state.zoom + (event.deltaY > 0 ? -0.06 : 0.06));
+        }, { passive: false });
+
+        let drag = null;
+        viewport.addEventListener("pointerdown", (event) => {
+          if (state.tool !== "pan") return;
+          drag = {
+            x: event.clientX,
+            y: event.clientY,
+            left: viewport.scrollLeft,
+            top: viewport.scrollTop
+          };
+          viewport.setPointerCapture(event.pointerId);
+        });
+        viewport.addEventListener("pointermove", (event) => {
+          if (!drag) return;
+          viewport.scrollLeft = drag.left - (event.clientX - drag.x);
+          viewport.scrollTop = drag.top - (event.clientY - drag.y);
+        });
+        viewport.addEventListener("pointerup", () => {
+          drag = null;
+        });
+      }
+
+      function bindEvents() {
+        document.querySelector("#lightThemeButton").addEventListener("click", () => setTheme("light"));
+        document.querySelector("#darkThemeButton").addEventListener("click", () => setTheme("dark"));
+        document.querySelector("#generateButton").addEventListener("click", () => buildPageFromPrompt(document.querySelector("#promptInput").value));
+        document.querySelectorAll(".ds-chip").forEach((button) => {
+          button.addEventListener("click", () => {
+            document.querySelector("#promptInput").value = button.textContent;
+            buildPageFromPrompt(button.textContent);
+          });
+        });
+        document.querySelector("#variantSelect").addEventListener("change", (event) => applyVariantToSelected(event.target.value));
+        document.querySelector("#titleInput").addEventListener("input", (event) => {
+          const node = selectedNode();
+          if (node.props.title !== undefined) node.props.title = event.target.value;
+          else if (node.props.text !== undefined) node.props.text = event.target.value;
+          else node.props.placeholder = event.target.value;
+          render();
+        });
+        document.querySelector("#descriptionInput").addEventListener("input", (event) => {
+          selectedNode().props.description = event.target.value;
+          render();
+        });
+        document.querySelector("#rightTextInput").addEventListener("input", (event) => {
+          selectedNode().props.rightText = event.target.value;
+          render();
+        });
+        bindCanvasControls();
+      }
+
+      function render() {
+        renderVariantList();
+        renderLayers();
+        renderCanvas();
+        renderInspector();
+        renderFlowList();
+      }
+
+      bindEvents();
+      setTheme("light");
+      setTool("select");
+      setZoom(0.86);
+      render();
+    </script>
+  </body>
+</html>
