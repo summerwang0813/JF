@@ -1,0 +1,16 @@
+{
+  "name": "ComponentName",
+  "displayName": "中文组件名",
+  "figma": {
+    "fileKey": "",
+    "nodeId": "",
+    "url": ""
+  },
+  "techStack": ["React", "TypeScript", "Tailwind CSS"],
+  "variants": [],
+  "props": {},
+  "assets": [],
+  "preview": "./ComponentName.preview.tsx",
+  "agentUsage": [],
+  "needsDesignConfirmation": []
+}

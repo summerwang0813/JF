@@ -18,6 +18,26 @@
 - `mvp-assets/design/`: tokens、布局规则和页面结构
 - `mvp-assets/assets/`: 组件依赖图片与图标素材
 
+## Figma 组件转可用代码标准
+
+- `standards/figma-to-codex-component-standard.md`: Figma 组件转 Codex 可用组件的正式标准
+- `standards/codex-figma-component-prompt.md`: 负责人给 Codex 的输入模板
+- `standards/component-acceptance-checklist.md`: 设计、研发、Codex 三方验收清单
+- `templates/component/`: 单组件标准交付模板
+
+以后给 Codex 一个带 `node-id` 的 Figma 组件链接时，按上述标准输出：
+
+```text
+mvp-assets/components/ComponentName/
+├── ComponentName.tsx
+├── ComponentName.preview.tsx
+├── component.meta.json
+├── README.md
+└── assets/
+```
+
+组件技术栈统一为 `React + TypeScript + Tailwind CSS`。
+
 ## 本地预览
 
 直接用浏览器打开：
