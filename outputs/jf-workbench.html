@@ -43,11 +43,13 @@
         <section class="ds-panel-section">
           <div class="ds-stack">
             <textarea class="ds-prompt" id="promptInput">我需要手机号登录一整个流程</textarea>
-            <button class="ds-primary-button" id="generateButton" type="button">生成页面</button>
+            <button class="ds-primary-button" id="generateButton" type="button">发送 / 修改页面</button>
             <button class="ds-chip" type="button">我需要手机号登录一整个流程</button>
-            <button class="ds-chip" type="button">生成一个会员权益页面，包含 VIP 标题和说明</button>
-            <button class="ds-chip" type="button">生成一个直播页面，右侧显示直播日历</button>
-            <button class="ds-chip" type="button">生成一个港股资讯页面，标题后显示 HK 标签</button>
+            <button class="ds-chip" type="button">手机号改成 13800138000</button>
+            <button class="ds-chip" type="button">切到第二个页面</button>
+            <button class="ds-chip" type="button">验证码错误</button>
+            <button class="ds-chip" type="button">按钮改成下一步</button>
+            <button class="ds-chip" type="button">标题改成短信验证</button>
           </div>
         </section>
         <section class="ds-panel-section">
@@ -177,12 +179,42 @@
                   event.target.value = state.phoneNumber;
                   node.props.type = state.phoneNumber ? "电话-输入中" : "电话-默认";
                 } else {
-                  node.props.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+                  const isCodeInput = node.props.type === "验证码" || node.props.type === "验证码错误";
+                  node.props.value = isCodeInput
+                    ? event.target.value.replace(/\D/g, "").slice(0, 4)
+                    : event.target.value;
+                  if (node.props.defaultType === "文本-默认") {
+                    node.props.type = node.props.value ? "文本-输入中" : "文本-默认";
+                  }
                 }
                 renderJson();
                 document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
                   button.classList.toggle("disabled", !isPhoneValid());
                 });
+              },
+              onFocus: () => {
+                if (node.props.inputType === "phone") node.props.type = "电话-输入中";
+                else if (node.props.defaultType === "文本-默认") node.props.type = "文本-输入中";
+                renderJson();
+              },
+              onClear: () => {
+                if (node.props.inputType === "phone") {
+                  state.phoneNumber = "";
+                  node.props.type = "电话-输入中";
+                  document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
+                    button.classList.add("disabled");
+                  });
+                } else {
+                  node.props.value = "";
+                  if (node.props.type === "验证码错误") node.props.type = "验证码";
+                }
+                render();
+              },
+              onTogglePassword: () => {
+                node.props.type = node.props.type === "密码-输入中睁眼"
+                  ? "密码-输入中闭眼"
+                  : "密码-输入中睁眼";
+                render();
               }
             }
           );
@@ -314,6 +346,118 @@
         appendMessage("user", text);
         appendMessage("assistant", `已生成 ${nodes.length} 个 Heading 实例。`);
         render();
+      }
+
+      function findNode(id) {
+        return allNodes().find((node) => node.id === id);
+      }
+
+      function findFirstNode(component, screenId = state.activeScreenId) {
+        const screen = state.screens.find((item) => item.id === screenId) || state.screens[0];
+        return screen.nodes.find((node) => node.component === component);
+      }
+
+      function applyChatEdit(prompt) {
+        const text = prompt.trim();
+        if (!text) return;
+        appendMessage("user", text);
+
+        const replies = [];
+        const phoneMatch = text.match(/1\d{10}/);
+        if (phoneMatch) {
+          state.phoneNumber = phoneMatch[0];
+          const phoneNode = findNode("login-2");
+          if (phoneNode) phoneNode.props.type = "电话-输入中";
+          replies.push(`已把手机号改为 ${phoneMatch[0]}，获取验证码按钮会变为可点击。`);
+        }
+
+        const screenMatch = text.match(/第([一二三四1234])个|到([一二三四1234])|切到([一二三四1234])/);
+        if (screenMatch) {
+          const raw = screenMatch[1] || screenMatch[2] || screenMatch[3];
+          const map = { 一: 1, 二: 2, 三: 3, 四: 4, "1": 1, "2": 2, "3": 3, "4": 4 };
+          const nextScreen = state.screens[map[raw] - 1];
+          if (nextScreen) {
+            state.activeScreenId = nextScreen.id;
+            state.selectedId = nextScreen.nodes[0].id;
+            replies.push(`已切换到 ${nextScreen.name}。`);
+          }
+        }
+
+        if (/验证码.*错误|错误态|校验失败/.test(text)) {
+          const codeNode = findNode("code-3");
+          if (codeNode) {
+            codeNode.props.type = "验证码错误";
+            codeNode.variant = "验证码错误";
+            codeNode.props.value = codeNode.props.value || "8299";
+            state.activeScreenId = "screen-code";
+            state.selectedId = "code-3";
+            replies.push("已把验证码组件切换为错误态。");
+          }
+        }
+
+        if (/清空|删掉手机号|删除手机号/.test(text)) {
+          state.phoneNumber = "";
+          const phoneNode = findNode("login-2");
+          if (phoneNode) phoneNode.props.type = "电话-默认";
+          replies.push("已清空手机号，并把获取验证码按钮恢复为禁用态。");
+        }
+
+        const titleMatch = text.match(/(?:标题|页面标题|主标题)(?:改成|改为|换成|设置为)([^，。,.]+)/);
+        if (titleMatch) {
+          const hero = findFirstNode("HeroText");
+          if (hero) {
+            hero.props.title = titleMatch[1].trim();
+            replies.push(`已把当前页标题改为“${hero.props.title}”。`);
+          }
+        }
+
+        const buttonMatch = text.match(/(?:按钮|按钮文案)(?:改成|改为|换成|设置为)([^，。,.]+)/);
+        if (buttonMatch) {
+          const button = findFirstNode("Button");
+          if (button) {
+            button.props.text = buttonMatch[1].trim();
+            replies.push(`已把当前页按钮改为“${button.props.text}”。`);
+          }
+        }
+
+        if (/去掉.*标题|删除.*标题|不要.*标题/.test(text)) {
+          const screen = state.screens.find((item) => item.id === state.activeScreenId);
+          const before = screen.nodes.length;
+          screen.nodes = screen.nodes.filter((node) => node.component !== "HeroText" && node.component !== "Heading");
+          if (screen.nodes.length !== before) {
+            state.selectedId = screen.nodes[0]?.id || state.selectedId;
+            replies.push("已去掉当前页面标题区域。");
+          }
+        }
+
+        if (/密码登录|密码输入/.test(text)) {
+          const phoneNode = findNode("login-2");
+          if (phoneNode) {
+            phoneNode.props = { defaultType: "密码-默认", type: "密码-默认", placeholder: "请输入登录密码" };
+            phoneNode.variant = "密码-默认";
+            replies.push("已把手机号输入框切换为密码输入框。");
+          }
+        }
+
+        if (!replies.length) {
+          replies.push("我还没有识别到明确修改规则。可以试试：标题改成登录、按钮改成下一步、切到第二个、验证码错误、清空手机号。");
+        }
+
+        appendMessage("assistant", replies.join(" "));
+        render();
+      }
+
+      function submitPrompt() {
+        const input = document.querySelector("#promptInput");
+        const text = input.value.trim();
+        if (!text) return;
+        const hasFlow = state.screens.some((screen) => screen.id === "screen-phone");
+        if (!hasFlow || /生成|新建|重新|一整个流程|登录注册流程|手机号登录/.test(text)) {
+          buildPageFromPrompt(text);
+        } else {
+          applyChatEdit(text);
+        }
+        input.value = "";
       }
 
       function appendMessage(role, text) {
@@ -559,11 +703,14 @@
       function bindEvents() {
         document.querySelector("#lightThemeButton").addEventListener("click", () => setTheme("light"));
         document.querySelector("#darkThemeButton").addEventListener("click", () => setTheme("dark"));
-        document.querySelector("#generateButton").addEventListener("click", () => buildPageFromPrompt(document.querySelector("#promptInput").value));
+        document.querySelector("#generateButton").addEventListener("click", submitPrompt);
+        document.querySelector("#promptInput").addEventListener("keydown", (event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === "Enter") submitPrompt();
+        });
         document.querySelectorAll(".ds-chip").forEach((button) => {
           button.addEventListener("click", () => {
             document.querySelector("#promptInput").value = button.textContent;
-            buildPageFromPrompt(button.textContent);
+            submitPrompt();
           });
         });
         document.querySelector("#variantSelect").addEventListener("change", (event) => applyVariantToSelected(event.target.value));

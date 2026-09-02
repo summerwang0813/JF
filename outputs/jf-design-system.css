@@ -992,15 +992,26 @@ html[data-theme="dark"] .ds-screen-board {
   background: #f3f5f7;
 }
 
-.fd-login-register-icon {
+.fd-login-register-icon-button {
   width: 22px;
   height: 22px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.fd-login-register-icon-button.is-hidden {
+  display: none;
+}
+
+.fd-login-register-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
   color: #161717;
-  font-size: 22px;
-  line-height: 22px;
 }
 
 .fd-login-register-code {

@@ -197,25 +197,52 @@
     field.addEventListener("click", (event) => event.stopPropagation());
     field.addEventListener("pointerdown", (event) => event.stopPropagation());
     field.addEventListener("focus", (event) => event.stopPropagation());
+    field.addEventListener("focus", (event) => events.onFocus?.(event));
     field.addEventListener("input", (event) => {
       event.stopPropagation();
+      input.classList.add("active");
+      input.querySelector(".fd-login-register-icon-button.clear")?.classList.toggle("is-hidden", !event.target.value);
       events.onInput?.(event);
     });
     input.append(field);
 
-    if (isEditing) {
+    if (!isCode) {
+      const button = document.createElement("button");
+      button.className = `fd-login-register-icon-button clear ${!isEditing && !value ? "is-hidden" : ""}`;
+      button.type = "button";
+      button.setAttribute("aria-label", "清空输入");
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        field.value = "";
+        input.querySelector(".fd-login-register-icon-button.clear")?.classList.add("is-hidden");
+        events.onClear?.(event);
+        field.focus();
+      });
+      button.addEventListener("pointerdown", (event) => event.stopPropagation());
       const close = document.createElement("img");
       close.className = "fd-login-register-icon";
       close.alt = "";
       close.src = `${assetBase}close.svg`;
-      input.append(close);
+      button.append(close);
+      input.append(button);
     }
     if (isPassword) {
+      const button = document.createElement("button");
+      button.className = "fd-login-register-icon-button";
+      button.type = "button";
+      button.setAttribute("aria-label", isVisible ? "隐藏密码" : "显示密码");
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        events.onTogglePassword?.(event);
+        field.focus();
+      });
+      button.addEventListener("pointerdown", (event) => event.stopPropagation());
       const visible = document.createElement("img");
       visible.className = "fd-login-register-icon";
       visible.alt = "";
       visible.src = `${assetBase}${isVisible ? "password-visible.svg" : "password-hidden.svg"}`;
-      input.append(visible);
+      button.append(visible);
+      input.append(button);
     }
     return input;
   }
