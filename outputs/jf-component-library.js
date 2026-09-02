@@ -245,7 +245,7 @@
     return button;
   }
 
-  window.OJOComponents = {
+  window.JFComponents = {
     el,
     headingVariants,
     Heading,

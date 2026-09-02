@@ -1,6 +1,6 @@
-# OJO-like AI Canvas Visual Spec
+# JF AI Canvas Visual Spec
 
-> 基于 OJO dashboard 公开可访问页面、加载态、静态资源 token 和产品定位提炼。目标不是复制 OJO，而是沉淀一套适合“AI 生成页面 + 无限画布 + 可交互原型”的工作台视觉规范。
+> 面向 JF 平台沉淀的视觉规范。目标是形成一套适合“AI 生成页面 + 无限画布 + 可交互原型”的工作台设计系统。
 
 ## 1. 设计关键词
 
@@ -380,4 +380,3 @@ JsonViewer
 3. 再改组件：按钮、输入框、卡片、JSON、流程条
 4. 再改 canvas object：手机、页面平铺、当前状态高亮
 5. 最后检查黑白主题对比度和手机内部可读性
-
