@@ -199,7 +199,7 @@ export default function LoginRegisterInput({
         data-figma-type={currentType}
       >
         <div
-          className="relative grid grid-cols-4 justify-between gap-fd-4"
+          className="relative grid grid-cols-4 gap-fd-3"
           onClick={() => inputRef.current?.focus()}
         >
           <input
@@ -222,7 +222,7 @@ export default function LoginRegisterInput({
             <span
               aria-hidden="true"
               className={cx(
-                "grid h-fd-code w-fd-code place-items-center rounded-fd-md border-[1.2px] bg-fd-card text-center text-[19.2px] font-medium leading-[28.8px] text-fd-primary",
+                "grid aspect-square w-full max-w-[60px] place-self-center rounded-fd-md border-[1.2px] bg-fd-card text-center text-[19.2px] font-medium leading-[28.8px] text-fd-primary",
                 isVerificationError && "border-fd-error",
                 !isVerificationError && index === activeIndex && "border-fd-active",
                 !isVerificationError && index !== activeIndex && "border-fd-surface",
