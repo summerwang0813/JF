@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JF Component Reference</title>
+    <style>
+      :root {
+        --bg: #f7f7f5;
+        --panel: #ffffff;
+        --line: #e5e8eb;
+        --text: #161717;
+        --muted: #5d5f61;
+        --weak: #85898f;
+        --disabled: #bfc2c7;
+        --brand: #0068ff;
+        --brand-disabled: #99c3ff;
+        --error: #f5444f;
+        --code: #111827;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow: hidden;
+        color: var(--text);
+        background: var(--bg);
+        font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 320px minmax(520px, 1fr) 380px;
+        grid-template-rows: 56px minmax(0, 1fr);
+        height: 100vh;
+      }
+
+      .topbar {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-bottom: 1px solid rgba(22, 23, 23, 0.1);
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        font-size: 15px;
+        line-height: 22px;
+        font-weight: 760;
+      }
+
+      .pill {
+        height: 30px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        background: #fff;
+        font-size: 12px;
+        line-height: 18px;
+      }
+
+      .panel {
+        min-height: 0;
+        overflow: auto;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .panel.left {
+        border-right: 1px solid rgba(22, 23, 23, 0.1);
+      }
+
+      .panel.right {
+        border-left: 1px solid rgba(22, 23, 23, 0.1);
+      }
+
+      .section {
+        margin-bottom: 18px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 18px;
+        font-weight: 750;
+        text-transform: uppercase;
+      }
+
+      .card {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .small {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 22px;
+      }
+
+      .check {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 20px;
+      }
+
+      .check span::before {
+        content: "✓";
+        margin-right: 8px;
+        color: var(--brand);
+        font-weight: 800;
+      }
+
+      .canvas {
+        min-height: 0;
+        overflow: auto;
+        padding: 32px;
+        background-image:
+          linear-gradient(rgba(22, 23, 23, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(22, 23, 23, 0.05) 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+
+      .preview {
+        width: min(760px, 100%);
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      .demo-title {
+        display: grid;
+        gap: 6px;
+      }
+
+      .demo-title h1 {
+        font-size: 24px;
+        line-height: 34px;
+      }
+
+      .state-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .state-card {
+        min-height: 128px;
+        display: grid;
+        align-content: start;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+      }
+
+      .state-name {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 18px;
+      }
+
+      .fd-input {
+        width: 100%;
+        max-width: 343px;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+        color: var(--text);
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .fd-input.active {
+        border-color: var(--brand);
+      }
+
+      .placeholder {
+        color: var(--weak);
+      }
+
+      .country {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex: 0 0 auto;
+      }
+
+      .country img,
+      .icon {
+        width: 22px;
+        height: 22px;
+        display: block;
+      }
+
+      .country img {
+        width: 16px;
+        height: 16px;
+      }
+
+      .divider {
+        width: 1px;
+        height: 20px;
+        background: #f3f5f7;
+      }
+
+      .input-text {
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .dots {
+        letter-spacing: 4px;
+      }
+
+      .code-grid {
+        max-width: 343px;
+        display: grid;
+        grid-template-columns: repeat(4, 60px);
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .code-cell {
+        width: 60px;
+        height: 60px;
+        display: grid;
+        place-items: center;
+        border: 1.2px solid #f3f5f7;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 19px;
+        line-height: 29px;
+        font-weight: 500;
+      }
+
+      .code-cell.active {
+        border-color: var(--brand);
+      }
+
+      .code-cell.error {
+        border-color: var(--error);
+      }
+
+      .feedback {
+        max-width: 343px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      .error-text {
+        color: var(--error);
+      }
+
+      .primary {
+        width: 100%;
+        max-width: 343px;
+        height: 40px;
+        border: 0;
+        border-radius: 4px;
+        color: #fff;
+        background: var(--brand);
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+      }
+
+      .primary:disabled {
+        background: var(--brand-disabled);
+      }
+
+      pre {
+        margin: 0;
+        overflow: auto;
+        padding: 12px;
+        border-radius: 8px;
+        color: #f8fafc;
+        background: var(--code);
+        font-size: 12px;
+        line-height: 19px;
+        white-space: pre-wrap;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">JF 标准组件引用页</div>
+        <span class="pill">React + TypeScript + Tailwind CSS</span>
+      </header>
+
+      <aside class="panel left">
+        <section class="section">
+          <h2>New Standard</h2>
+          <div class="card small">
+            每个 Figma 组件必须输出独立目录，包含 TSX、Preview、Meta、README 和本地 assets。Agent 读取 registry 后即可知道如何调用。
+          </div>
+        </section>
+        <section class="section">
+          <h2>Delivery</h2>
+          <div class="card check">
+            <span>LoginRegisterInput.tsx</span>
+            <span>LoginRegisterInput.preview.tsx</span>
+            <span>component.meta.json</span>
+            <span>README.md</span>
+            <span>assets/*.svg</span>
+            <span>registry.json 已更新</span>
+          </div>
+        </section>
+      </aside>
+
+      <section class="canvas">
+        <div class="preview">
+          <header class="demo-title">
+            <p class="small">Figma Node 28777:4260</p>
+            <h1>登录注册输入框</h1>
+          </header>
+
+          <section class="card stack">
+            <h2>Interactive Demo</h2>
+            <div class="fd-input active">
+              <span class="country">+86 <img src="../mvp-assets/components/LoginRegisterInput/assets/arrow-down-small.svg" alt="" /></span>
+              <span class="divider"></span>
+              <span class="input-text">13800138000</span>
+              <img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/close.svg" alt="" />
+            </div>
+            <button class="primary" type="button">获取验证码</button>
+            <button class="primary" type="button" disabled>未输入手机号时禁用</button>
+          </section>
+
+          <section class="state-grid">
+            <div class="state-card">
+              <p class="state-name">文本-默认</p>
+              <div class="fd-input"><span class="placeholder">请输入邮箱地址</span></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">文本-输入中</p>
+              <div class="fd-input active"><span class="input-text">输入</span><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/close.svg" alt="" /></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">电话-默认</p>
+              <div class="fd-input"><span class="country">+86 <img src="../mvp-assets/components/LoginRegisterInput/assets/arrow-down-small.svg" alt="" /></span><span class="divider"></span><span class="placeholder">请输入11位手机号码</span></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">电话-输入中</p>
+              <div class="fd-input active"><span class="country">+86 <img src="../mvp-assets/components/LoginRegisterInput/assets/arrow-down-small.svg" alt="" /></span><span class="divider"></span><span class="input-text">输入中</span><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/close.svg" alt="" /></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">密码-默认</p>
+              <div class="fd-input"><span class="placeholder input-text">请输入登录密码</span><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/password-hidden.svg" alt="" /></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">密码-输入中闭眼</p>
+              <div class="fd-input active"><span class="input-text dots">••••••••••</span><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/close.svg" alt="" /><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/password-hidden.svg" alt="" /></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">密码-输入中睁眼</p>
+              <div class="fd-input active"><span class="input-text">Abc12345678</span><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/close.svg" alt="" /><img class="icon" src="../mvp-assets/components/LoginRegisterInput/assets/password-visible.svg" alt="" /></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">验证码</p>
+              <div class="code-grid"><span class="code-cell active"></span><span class="code-cell"></span><span class="code-cell"></span><span class="code-cell"></span></div>
+              <div class="feedback"><span></span><span style="color: var(--disabled)">重新发送（57秒）</span></div>
+            </div>
+            <div class="state-card">
+              <p class="state-name">验证码错误</p>
+              <div class="code-grid"><span class="code-cell error">8</span><span class="code-cell error">2</span><span class="code-cell error">9</span><span class="code-cell error">9</span></div>
+              <div class="feedback"><span class="error-text">验证码错误，请重试</span><span>重新发送</span></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <aside class="panel right">
+        <section class="section">
+          <h2>Import</h2>
+          <pre><code>import LoginRegisterInput from "../mvp-assets/components/LoginRegisterInput/LoginRegisterInput";</code></pre>
+        </section>
+        <section class="section">
+          <h2>Use</h2>
+          <pre><code>&lt;LoginRegisterInput
+  defaultType="电话-默认"
+  placeholder="请输入11位手机号码"
+  onValueChange={(value) =&gt; console.log(value)}
+/&gt;</code></pre>
+        </section>
+        <section class="section">
+          <h2>Preview</h2>
+          <pre><code>import LoginRegisterInputPreview from "../mvp-assets/components/LoginRegisterInput/LoginRegisterInput.preview";</code></pre>
+        </section>
+        <section class="section">
+          <h2>Agent Registry</h2>
+          <pre><code>mvp-assets/components/registry.json
+
+file:
+./LoginRegisterInput/LoginRegisterInput.tsx
+
+preview:
+./LoginRegisterInput/LoginRegisterInput.preview.tsx
+
+meta:
+./LoginRegisterInput/component.meta.json</code></pre>
+        </section>
+      </aside>
+    </main>
+  </body>
+</html>

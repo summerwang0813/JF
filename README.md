@@ -5,6 +5,7 @@
 ## 文件入口
 
 - `outputs/jf-workbench.html`: 主工作台页面
+- `outputs/jf-component-reference.html`: 新标准组件引用与状态预览页
 - `outputs/jf-design-system.css`: JF 设计规范与组件样式
 - `outputs/jf-component-library.js`: 可被页面调用的组件库
 - `outputs/jf-visual-spec.md`: JF 视觉规范沉淀

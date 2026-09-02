@@ -12,6 +12,8 @@ const config: Config = {
       spacing: tokens.spacing,
       borderRadius: tokens.borderRadius,
       height: tokens.height,
+      width: tokens.width,
+      fontFamily: tokens.fontFamily,
       fontSize: tokens.fontSize
     }
   }

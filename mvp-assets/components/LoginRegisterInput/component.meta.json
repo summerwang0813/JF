@@ -1,0 +1,61 @@
+{
+  "name": "LoginRegisterInput",
+  "displayName": "登录注册输入框",
+  "figma": {
+    "fileKey": "QXHr0F9Ay9SJ2qa5GudRaj",
+    "nodeId": "28777:4260",
+    "url": "https://www.figma.com/design/QXHr0F9Ay9SJ2qa5GudRaj/%E6%96%B9%E5%BE%B7App%E7%BB%84%E4%BB%B6%E5%BA%93%EF%BC%8826%E7%89%88%EF%BC%89?node-id=28777-4260"
+  },
+  "techStack": ["React", "TypeScript", "Tailwind CSS"],
+  "variants": [
+    "文本-默认",
+    "文本-输入中",
+    "电话-默认",
+    "电话-输入中",
+    "密码-默认",
+    "密码-输入中闭眼",
+    "密码-输入中睁眼",
+    "验证码",
+    "验证码错误"
+  ],
+  "props": {
+    "type": "LoginRegisterInputType",
+    "defaultType": "LoginRegisterInputType",
+    "value": "string",
+    "defaultValue": "string",
+    "placeholder": "string",
+    "countryCode": "string",
+    "errorMessage": "string",
+    "resendLabel": "string",
+    "resendDisabled": "boolean",
+    "onValueChange": "(value: string) => void",
+    "onTypeChange": "(type: LoginRegisterInputType) => void",
+    "onResend": "() => void"
+  },
+  "assets": [
+    "./assets/close.svg",
+    "./assets/password-hidden.svg",
+    "./assets/password-visible.svg",
+    "./assets/arrow-down-small.svg"
+  ],
+  "preview": "./LoginRegisterInput.preview.tsx",
+  "agentUsage": [
+    "手机号登录页使用 defaultType=\"电话-默认\"",
+    "验证码页使用 type=\"验证码\"",
+    "验证码错误页使用 type=\"验证码错误\"",
+    "密码登录页使用 defaultType=\"密码-默认\""
+  ],
+  "excludedFigmaVariants": [
+    {
+      "name": "Type10",
+      "reason": "疑似重复/临时变体，未作为正式可调用状态。"
+    }
+  ],
+  "needsDesignConfirmation": [
+    {
+      "field": "variant",
+      "value": "Type10",
+      "question": "这个变体是否为正式状态？如果正式，需要重命名并补充使用场景。"
+    }
+  ]
+}

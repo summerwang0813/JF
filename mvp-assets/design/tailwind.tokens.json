@@ -32,9 +32,15 @@
     "fd-lg": "12px",
     "fd-pill": "999px"
   },
+  "fontFamily": {
+    "fd-sans": ["PingFang SC", "Microsoft YaHei", "Arial", "sans-serif"]
+  },
   "height": {
     "fd-input": "56px",
     "fd-button": "40px",
+    "fd-code": "60px"
+  },
+  "width": {
     "fd-code": "60px"
   },
   "fontSize": {
