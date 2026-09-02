@@ -290,6 +290,28 @@ button {
   gap: 10px;
 }
 
+.ds-chat-composer {
+  display: grid;
+  gap: 8px;
+}
+
+.ds-composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ds-composer-actions span {
+  color: var(--ds-text-muted);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.ds-prompt-examples {
+  margin-top: 12px;
+}
+
 .ds-prompt {
   width: 100%;
   min-height: 152px;
@@ -305,11 +327,18 @@ button {
 
 .ds-primary-button {
   height: 42px;
+  min-width: 86px;
+  padding: 0 14px;
   border: 1px solid var(--ds-accent);
   border-radius: var(--ds-radius-sm);
   font-size: 13px;
   line-height: 20px;
   font-weight: 700;
+}
+
+.ds-primary-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
 }
 
 .ds-chip,
@@ -1084,6 +1113,8 @@ html[data-theme="dark"] .ds-screen-board {
   margin: 0 24px 12px;
   display: grid;
   place-items: center;
+  width: calc(100% - 48px);
+  border: 0;
   border-radius: 8px;
   color: #ffffff;
   background: var(--app-accent);
@@ -1093,6 +1124,11 @@ html[data-theme="dark"] .ds-screen-board {
 }
 
 .fd-app-button.disabled {
+  background: #c7ccd4;
+  cursor: not-allowed;
+}
+
+.fd-app-button:disabled {
   background: #c7ccd4;
   cursor: not-allowed;
 }

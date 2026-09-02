@@ -248,9 +248,15 @@
   }
 
   function AppButton(props, events = {}) {
-    const button = el("div", `fd-app-button ${props.disabled ? "disabled" : ""}`, props.text);
+    const button = el("button", `fd-app-button ${props.disabled ? "disabled" : ""}`, props.text);
+    button.type = "button";
+    button.disabled = Boolean(props.disabled);
     button.dataset.requiresPhone = props.requiresPhone ? "true" : "false";
-    button.addEventListener("click", events.onClick || (() => {}));
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (button.disabled || button.classList.contains("disabled")) return;
+      events.onClick?.(event);
+    });
     return button;
   }
 

@@ -41,9 +41,14 @@
           </div>
         </section>
         <section class="ds-panel-section">
-          <div class="ds-stack">
+          <div class="ds-chat-composer">
             <textarea class="ds-prompt" id="promptInput">我需要手机号登录一整个流程</textarea>
-            <button class="ds-primary-button" id="generateButton" type="button">发送 / 修改页面</button>
+            <div class="ds-composer-actions">
+              <span>Cmd/Ctrl + Enter 发送</span>
+              <button class="ds-primary-button" id="generateButton" type="button">发送</button>
+            </div>
+          </div>
+          <div class="ds-stack ds-prompt-examples">
             <button class="ds-chip" type="button">我需要手机号登录一整个流程</button>
             <button class="ds-chip" type="button">手机号改成 13800138000</button>
             <button class="ds-chip" type="button">切到第二个页面</button>
@@ -190,6 +195,7 @@
                 renderJson();
                 document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
                   button.classList.toggle("disabled", !isPhoneValid());
+                  button.disabled = !isPhoneValid();
                 });
               },
               onFocus: () => {
@@ -203,6 +209,7 @@
                   node.props.type = "电话-输入中";
                   document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
                     button.classList.add("disabled");
+                    button.disabled = true;
                   });
                 } else {
                   node.props.value = "";
@@ -458,6 +465,13 @@
           applyChatEdit(text);
         }
         input.value = "";
+        updatePromptControl();
+      }
+
+      function updatePromptControl() {
+        const input = document.querySelector("#promptInput");
+        const button = document.querySelector("#generateButton");
+        button.disabled = !input.value.trim();
       }
 
       function appendMessage(role, text) {
@@ -704,6 +718,7 @@
         document.querySelector("#lightThemeButton").addEventListener("click", () => setTheme("light"));
         document.querySelector("#darkThemeButton").addEventListener("click", () => setTheme("dark"));
         document.querySelector("#generateButton").addEventListener("click", submitPrompt);
+        document.querySelector("#promptInput").addEventListener("input", updatePromptControl);
         document.querySelector("#promptInput").addEventListener("keydown", (event) => {
           if ((event.metaKey || event.ctrlKey) && event.key === "Enter") submitPrompt();
         });
@@ -746,6 +761,7 @@
       setTool("select");
       setZoom(0.86);
       buildPhoneLoginFlow(document.querySelector("#promptInput").value);
+      updatePromptControl();
     </script>
   </body>
 </html>
