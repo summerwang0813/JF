@@ -1,0 +1,47 @@
+{
+  "id": "login-register-input-flow",
+  "name": "手机号登录注册流程",
+  "entry": "phone-login",
+  "steps": [
+    {
+      "id": "phone-login",
+      "title": "手机号输入",
+      "screenId": "screen-phone-login",
+      "componentState": "电话-默认",
+      "userAction": "点击手机号输入框并输入手机号",
+      "next": "phone-validating"
+    },
+    {
+      "id": "phone-validating",
+      "title": "手机号校验",
+      "screenId": "screen-phone-login",
+      "componentState": "电话-输入中",
+      "rule": "手机号满足 /^1\\d{10}$/ 时，获取验证码按钮可点击",
+      "next": "sms-code"
+    },
+    {
+      "id": "sms-code",
+      "title": "验证码输入",
+      "screenId": "screen-sms-code",
+      "componentState": "验证码",
+      "userAction": "输入 4 位短信验证码",
+      "next": "sms-code-error"
+    },
+    {
+      "id": "sms-code-error",
+      "title": "验证码错误",
+      "screenId": "screen-sms-code-error",
+      "componentState": "验证码错误",
+      "userAction": "点击重新发送或重新输入验证码",
+      "next": "login-success"
+    },
+    {
+      "id": "login-success",
+      "title": "登录成功",
+      "screenId": "screen-login-success",
+      "componentState": null,
+      "userAction": "进入首页",
+      "next": null
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "version": "0.1.0",
+  "baseViewport": {
+    "width": 375,
+    "height": 812
+  },
+  "screens": [
+    {
+      "id": "screen-phone-login",
+      "name": "手机号登录",
+      "purpose": "用户输入手机号并获取短信验证码",
+      "components": [
+        {
+          "component": "LoginRegisterInput",
+          "variant": "电话-默认",
+          "props": {
+            "placeholder": "请输入11位手机号码",
+            "countryCode": "+86"
+          }
+        }
+      ],
+      "states": [
+        {
+          "name": "未输入手机号",
+          "buttonState": "disabled"
+        },
+        {
+          "name": "手机号输入合法",
+          "buttonState": "active"
+        }
+      ]
+    },
+    {
+      "id": "screen-sms-code",
+      "name": "验证码输入",
+      "purpose": "用户输入短信验证码",
+      "components": [
+        {
+          "component": "LoginRegisterInput",
+          "variant": "验证码",
+          "props": {
+            "resendLabel": "重新发送（57秒）",
+            "resendDisabled": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "screen-sms-code-error",
+      "name": "验证码错误",
+      "purpose": "验证码校验失败后的错误反馈",
+      "components": [
+        {
+          "component": "LoginRegisterInput",
+          "variant": "验证码错误",
+          "props": {
+            "value": "8299",
+            "errorMessage": "验证码错误，请重试",
+            "resendLabel": "重新发送"
+          }
+        }
+      ]
+    }
+  ]
+}

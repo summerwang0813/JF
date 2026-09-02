@@ -1,0 +1,145 @@
+{
+  "version": "0.1.0",
+  "source": {
+    "type": "figma",
+    "fileKey": "QXHr0F9Ay9SJ2qa5GudRaj",
+    "nodeId": "28777:4260",
+    "url": "https://www.figma.com/design/QXHr0F9Ay9SJ2qa5GudRaj?node-id=28777-4260"
+  },
+  "components": [
+    {
+      "name": "LoginRegisterInput",
+      "displayName": "登录注册输入框",
+      "category": "form",
+      "file": "./LoginRegisterInput.tsx",
+      "style": "./LoginRegisterInput.css",
+      "figmaNodeId": "28777:4260",
+      "status": "ready",
+      "description": "用于登录注册场景的输入框组件，覆盖文本、手机号、密码、验证码与验证码错误状态。",
+      "variants": [
+        {
+          "property": "type",
+          "options": [
+            "文本-默认",
+            "文本-输入中",
+            "电话-默认",
+            "电话-输入中",
+            "密码-默认",
+            "密码-输入中闭眼",
+            "密码-输入中睁眼",
+            "验证码",
+            "验证码错误"
+          ]
+        }
+      ],
+      "excludedFigmaVariants": [
+        {
+          "name": "Type10",
+          "reason": "Figma 中疑似重复/临时变体，视觉与“文本-输入中”接近，MVP 阶段不作为 Agent 可调用状态。"
+        }
+      ],
+      "props": {
+        "type": {
+          "type": "LoginRegisterInputType",
+          "required": false,
+          "default": "文本-默认",
+          "description": "外部受控的 Figma Type 变体。"
+        },
+        "defaultType": {
+          "type": "LoginRegisterInputType",
+          "required": false,
+          "default": "文本-默认",
+          "description": "非受控模式下的初始变体。"
+        },
+        "value": {
+          "type": "string",
+          "required": false,
+          "description": "输入值，文本、手机号、密码、验证码共用。"
+        },
+        "defaultValue": {
+          "type": "string",
+          "required": false,
+          "default": "",
+          "description": "非受控模式下的初始输入值。"
+        },
+        "onValueChange": {
+          "type": "(value: string) => void",
+          "required": false,
+          "description": "输入值变化回调。"
+        },
+        "onTypeChange": {
+          "type": "(type: LoginRegisterInputType) => void",
+          "required": false,
+          "description": "组件内部状态切换回调。"
+        },
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "辅助技术读取的字段名称。"
+        },
+        "placeholder": {
+          "type": "string",
+          "required": false,
+          "description": "输入框占位文案。"
+        },
+        "countryCode": {
+          "type": "string",
+          "required": false,
+          "default": "+86",
+          "description": "手机号输入框展示的国家/地区区号。"
+        },
+        "errorMessage": {
+          "type": "string",
+          "required": false,
+          "default": "验证码错误，请重试",
+          "description": "验证码错误状态下的错误文案。"
+        },
+        "resendLabel": {
+          "type": "string",
+          "required": false,
+          "default": "重新发送",
+          "description": "验证码状态下的重新发送文案。"
+        },
+        "resendDisabled": {
+          "type": "boolean",
+          "required": false,
+          "default": false,
+          "description": "是否禁用重新发送。"
+        }
+      },
+      "assets": [
+        "../assets/LoginRegisterInput/close.svg",
+        "../assets/LoginRegisterInput/password-hidden.svg",
+        "../assets/LoginRegisterInput/password-visible.svg",
+        "../assets/LoginRegisterInput/arrow-down-small.svg"
+      ],
+      "agentUsage": [
+        {
+          "intent": "手机号登录",
+          "useVariant": "电话-默认",
+          "when": "登录页手机号字段初始状态"
+        },
+        {
+          "intent": "手机号输入中",
+          "useVariant": "电话-输入中",
+          "when": "用户聚焦或输入手机号"
+        },
+        {
+          "intent": "密码登录",
+          "useVariant": "密码-默认",
+          "when": "密码登录页初始状态"
+        },
+        {
+          "intent": "验证码输入",
+          "useVariant": "验证码",
+          "when": "短信验证码页面"
+        },
+        {
+          "intent": "验证码错误",
+          "useVariant": "验证码错误",
+          "when": "验证码校验失败"
+        }
+      ]
+    }
+  ]
+}
