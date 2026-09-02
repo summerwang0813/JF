@@ -76,6 +76,10 @@
           <div id="variantList"></div>
         </section>
         <section class="ds-panel-section">
+          <h2 class="ds-panel-title">Callable Components</h2>
+          <div id="callableComponents"></div>
+        </section>
+        <section class="ds-panel-section">
           <h2 class="ds-panel-title">Inspector</h2>
           <div class="ds-field">
             <label for="variantSelect">Variant</label>
@@ -160,13 +164,21 @@
       function renderNodeBlock(node) {
         if (node.component === "Heading") return C.Heading(mergedProps(node));
         if (node.component === "HeroText") return C.HeroText(node.props);
-        if (node.component === "Input") {
-          return C.AppInput(
-            { ...node.props, value: node.props.inputType === "phone" ? state.phoneNumber : "" },
+        if (node.component === "LoginRegisterInput") {
+          return C.LoginRegisterInput(
+            {
+              ...node.props,
+              value: node.props.inputType === "phone" ? state.phoneNumber : node.props.value
+            },
             {
               onInput: (event) => {
-                state.phoneNumber = event.target.value.replace(/\D/g, "").slice(0, 11);
-                event.target.value = state.phoneNumber;
+                if (node.props.inputType === "phone") {
+                  state.phoneNumber = event.target.value.replace(/\D/g, "").slice(0, 11);
+                  event.target.value = state.phoneNumber;
+                  node.props.type = state.phoneNumber ? "电话-输入中" : "电话-默认";
+                } else {
+                  node.props.value = event.target.value;
+                }
                 renderJson();
                 document.querySelectorAll('[data-requires-phone="true"]').forEach((button) => {
                   button.classList.toggle("disabled", !isPhoneValid());
@@ -223,7 +235,7 @@
             name: "01 手机号登录",
             nodes: [
               { id: "login-1", component: "HeroText", props: { title: "手机号登录", subtitle: "未注册手机号验证后将自动创建账号" } },
-              { id: "login-2", component: "Input", props: { placeholder: "请输入手机号", inputType: "phone" } },
+              { id: "login-2", component: "LoginRegisterInput", variant: "电话-默认", props: { defaultType: "电话-默认", type: "电话-默认", placeholder: "请输入11位手机号码", inputType: "phone", countryCode: "+86" } },
               { id: "login-3", component: "Button", props: { text: "获取验证码", requiresPhone: true, nextScreenId: "screen-code" } },
               { id: "login-4", component: "Agreement", props: { text: "登录即代表同意《用户协议》和《隐私政策》" } }
             ]
@@ -234,7 +246,7 @@
             nodes: [
               { id: "code-1", component: "Heading", variant: "NoArrow", props: { title: "输入验证码" } },
               { id: "code-2", component: "HeroText", props: { title: "验证手机号", subtitle: "验证码已发送至 138****8888" } },
-              { id: "code-3", component: "Input", props: { placeholder: "请输入 6 位验证码", action: "重新发送" } },
+              { id: "code-3", component: "LoginRegisterInput", variant: "验证码", props: { type: "验证码", value: "", resendLabel: "重新发送（57秒）", resendDisabled: true } },
               { id: "code-4", component: "Button", props: { text: "登录 / 注册", nextScreenId: "screen-profile" } }
             ]
           },
@@ -243,8 +255,8 @@
             name: "03 完善信息",
             nodes: [
               { id: "profile-1", component: "Heading", variant: "DescriptionOnly", props: { title: "完善资料", description: "设置昵称后即可完成注册" } },
-              { id: "profile-2", component: "Input", props: { placeholder: "请输入昵称" } },
-              { id: "profile-3", component: "Input", props: { placeholder: "选择感兴趣的市场", action: "沪深 / 港股" } },
+              { id: "profile-2", component: "LoginRegisterInput", variant: "文本-默认", props: { defaultType: "文本-默认", placeholder: "请输入昵称" } },
+              { id: "profile-3", component: "LoginRegisterInput", variant: "文本-默认", props: { defaultType: "文本-默认", placeholder: "选择感兴趣的市场" } },
               { id: "profile-4", component: "Button", props: { text: "完成注册", nextScreenId: "screen-success" } }
             ]
           },
@@ -331,6 +343,27 @@
             onClick: () => applyVariantToSelected(variant.name)
           }));
         });
+      }
+
+      function renderCallableComponents() {
+        const list = document.querySelector("#callableComponents");
+        list.innerHTML = "";
+        const card = C.el("div", "ds-component-card active");
+        card.innerHTML = `
+          <div class="ds-component-name">
+            <span>LoginRegisterInput</span>
+            <span class="ds-node-id">28777:4260</span>
+          </div>
+          <div class="ds-flow-desc">来自 mvp-assets/components/LoginRegisterInput/LoginRegisterInput.tsx</div>
+          <pre class="ds-json-view">import LoginRegisterInput from "../mvp-assets/components/LoginRegisterInput/LoginRegisterInput";
+
+&lt;LoginRegisterInput
+  defaultType="电话-默认"
+  placeholder="请输入11位手机号码"
+  onValueChange={(value) =&gt; console.log(value)}
+/&gt;</pre>
+        `;
+        list.append(card);
       }
 
       function renderLayers() {
@@ -439,7 +472,8 @@
           selected: {
             component: node.component,
             variant: node.variant,
-            figmaNodeId: node.variant ? C.headingVariants[node.variant].figmaNodeId : undefined,
+            figmaNodeId: node.component === "LoginRegisterInput" ? "28777:4260" : node.variant ? C.headingVariants[node.variant].figmaNodeId : undefined,
+            source: node.component === "LoginRegisterInput" ? "mvp-assets/components/LoginRegisterInput/LoginRegisterInput.tsx" : undefined,
             props: node.props
           },
           flow: state.flowSteps,
@@ -449,6 +483,7 @@
                 nodes: screen.nodes.map((item) => ({
                   component: item.component,
                   variant: item.variant,
+                  source: item.component === "LoginRegisterInput" ? "mvp-assets/components/LoginRegisterInput/LoginRegisterInput.tsx" : undefined,
                   props: item.props
                 }))
               }))
@@ -569,6 +604,7 @@
 
       function render() {
         renderVariantList();
+        renderCallableComponents();
         renderLayers();
         renderCanvas();
         renderInspector();
@@ -579,7 +615,7 @@
       setTheme("light");
       setTool("select");
       setZoom(0.86);
-      render();
+      buildPhoneLoginFlow(document.querySelector("#promptInput").value);
     </script>
   </body>
 </html>

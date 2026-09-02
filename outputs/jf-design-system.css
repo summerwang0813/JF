@@ -942,6 +942,119 @@ html[data-theme="dark"] .ds-screen-board {
   font-weight: 600;
 }
 
+.fd-login-register-input {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 24px 12px;
+  padding: 0 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #161717;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.fd-login-register-input.active {
+  border-color: #0068ff;
+}
+
+.fd-login-register-input input {
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: #161717;
+  background: transparent;
+  font-size: 16px;
+  line-height: 24px;
+  caret-color: #0068ff;
+}
+
+.fd-login-register-input input::placeholder {
+  color: #85898f;
+}
+
+.fd-login-register-country {
+  flex-shrink: 0;
+  color: #161717;
+}
+
+.fd-login-register-divider {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  background: #f3f5f7;
+}
+
+.fd-login-register-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: #161717;
+  font-size: 22px;
+  line-height: 22px;
+}
+
+.fd-login-register-code {
+  display: grid;
+  gap: 8px;
+  margin: 0 24px 12px;
+}
+
+.fd-login-register-code-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.fd-login-register-code-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1.2px solid #f3f5f7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #161717;
+  font-size: 19px;
+  line-height: 29px;
+  font-weight: 500;
+}
+
+.fd-login-register-code-cell.active {
+  border-color: #0068ff;
+}
+
+.fd-login-register-code-cell.error {
+  border-color: #f5444f;
+}
+
+.fd-login-register-feedback {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #5d5f61;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.fd-login-register-feedback .disabled {
+  margin-left: auto;
+  color: #bfc2c7;
+}
+
+.fd-login-register-error {
+  color: #f5444f;
+}
+
 .fd-app-button {
   height: 48px;
   margin: 0 24px 12px;

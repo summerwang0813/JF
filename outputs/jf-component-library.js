@@ -123,6 +123,61 @@
     return input;
   }
 
+  function LoginRegisterInput(props, events = {}) {
+    const type = props.type || props.defaultType || "文本-默认";
+    const isPhone = type.startsWith("电话");
+    const isPassword = type.startsWith("密码");
+    const isEditing = type.includes("输入中");
+    const isVisible = type === "密码-输入中睁眼";
+    const isCode = type === "验证码" || type === "验证码错误";
+    const isError = type === "验证码错误";
+    const value = props.value || "";
+    const placeholder = props.placeholder || (isPhone ? "请输入11位手机号码" : isPassword ? "请输入登录密码" : "请输入邮箱地址");
+
+    if (isCode) {
+      const wrapper = el("div", "fd-login-register-code");
+      const grid = el("div", "fd-login-register-code-grid");
+      const digits = value.slice(0, 4).split("");
+      Array.from({ length: 4 }, (_, index) => {
+        const cell = el("span", `fd-login-register-code-cell ${isError ? "error" : index === digits.length ? "active" : ""}`, digits[index] || "");
+        grid.append(cell);
+      });
+      wrapper.append(grid);
+      const feedback = el("div", "fd-login-register-feedback");
+      if (isError) feedback.append(el("span", "fd-login-register-error", props.errorMessage || "验证码错误，请重试"));
+      feedback.append(el("span", isError ? "" : "disabled", props.resendLabel || (isError ? "重新发送" : "重新发送（57秒）")));
+      wrapper.append(feedback);
+      return wrapper;
+    }
+
+    const input = el("div", `fd-login-register-input ${isEditing ? "active" : ""}`);
+    input.dataset.componentSource = "mvp-assets/components/LoginRegisterInput/LoginRegisterInput.tsx";
+    input.dataset.componentName = "LoginRegisterInput";
+    input.dataset.componentType = type;
+
+    if (isPhone) {
+      input.append(el("span", "fd-login-register-country", props.countryCode || "+86"));
+      input.append(el("span", "fd-login-register-divider"));
+    }
+
+    const field = document.createElement("input");
+    field.placeholder = placeholder;
+    field.value = value;
+    field.inputMode = isPhone ? "numeric" : "text";
+    field.maxLength = isPhone ? 11 : props.maxLength || 120;
+    field.type = isPassword && !isVisible ? "password" : "text";
+    field.addEventListener("click", (event) => event.stopPropagation());
+    field.addEventListener("input", (event) => {
+      event.stopPropagation();
+      events.onInput?.(event);
+    });
+    input.append(field);
+
+    if (isEditing) input.append(el("span", "fd-login-register-icon", "×"));
+    if (isPassword) input.append(el("span", "fd-login-register-icon", isVisible ? "◉" : "◌"));
+    return input;
+  }
+
   function AppButton(props, events = {}) {
     const button = el("div", `fd-app-button ${props.disabled ? "disabled" : ""}`, props.text);
     button.dataset.requiresPhone = props.requiresPhone ? "true" : "false";
@@ -252,6 +307,7 @@
     HeadingByVariant,
     HeroText,
     AppInput,
+    LoginRegisterInput,
     AppButton,
     Agreement,
     StatusPanel,
