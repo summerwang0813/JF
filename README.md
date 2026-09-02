@@ -24,6 +24,8 @@
 - `standards/codex-figma-component-prompt.md`: 负责人给 Codex 的输入模板
 - `standards/component-acceptance-checklist.md`: 设计、研发、Codex 三方验收清单
 - `templates/component/`: 单组件标准交付模板
+- `codex-request/figma-component-to-code.md`: 可直接粘贴给 Codex 的跨电脑任务格式
+- `codex-request/figma-component-to-code.json`: 可被系统/Agent 结构化读取的任务格式
 
 以后给 Codex 一个带 `node-id` 的 Figma 组件链接时，按上述标准输出：
 

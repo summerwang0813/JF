@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "0.1.0",
+  "taskType": "figma_component_to_runnable_code",
+  "goal": "把 Figma 组件链接转换成 JF 标准的可运行 React + TypeScript + Tailwind CSS 组件资产。",
+  "inputs": {
+    "figmaUrl": "<粘贴带 node-id 的 Figma 组件链接>",
+    "componentPurpose": "<组件用途>",
+    "officialVariants": [],
+    "replaceableProps": [],
+    "interactionRules": []
+  },
+  "mustRead": [
+    "standards/figma-to-codex-component-standard.md",
+    "standards/component-acceptance-checklist.md",
+    "templates/component/"
+  ],
+  "techStack": [
+    "React",
+    "TypeScript",
+    "Tailwind CSS"
+  ],
+  "outputContract": {
+    "componentDirectory": "mvp-assets/components/ComponentName/",
+    "requiredFiles": [
+      "ComponentName.tsx",
+      "ComponentName.preview.tsx",
+      "component.meta.json",
+      "README.md"
+    ],
+    "requiredDirectories": [
+      "assets/"
+    ],
+    "mustUpdate": [
+      "mvp-assets/components/registry.json",
+      "mvp-assets/design/tailwind.tokens.json",
+      "mvp-assets/design/tailwind.config.reference.ts"
+    ]
+  },
+  "componentRequirements": [
+    "默认导出 React 组件",
+    "导出 TypeScript props 类型",
+    "导出 variant 类型",
+    "实现 registry 声明的全部正式状态",
+    "文案、数值、disabled、错误信息、图标和状态必须可通过 props 替换",
+    "使用 Tailwind className 负责视觉样式",
+    "读取统一 token，不在组件中重复发明颜色、字号、间距、圆角",
+    "图标和图片必须本地化到组件 assets 目录",
+    "不依赖 Figma 临时 asset URL",
+    "至少提供一个可运行 preview"
+  ],
+  "previewRequirements": [
+    "展示全部正式 variant",
+    "展示至少一个 props 可修改示例",
+    "展示至少一个交互状态切换示例",
+    "展示错误态、禁用态、输入中态等关键状态"
+  ],
+  "workflow": [
+    "解析 Figma URL 的 fileKey 和 nodeId",
+    "读取 Figma design context",
+    "梳理组件变体、props、assets 和状态规则",
+    "下载并本地化 assets",
+    "生成 React + TypeScript + Tailwind 组件",
+    "生成 preview",
+    "生成 component.meta.json",
+    "更新 registry.json",
+    "更新 Tailwind token 映射",
+    "校验 JSON、引用路径、assets 和 TSX 语法",
+    "输出验收报告"
+  ],
+  "definitionOfDone": [
+    "组件可被 React 项目 import",
+    "preview 能展示全部正式状态",
+    "props 可修改并能影响组件",
+    "状态可切换",
+    "视觉与 Figma 基本一致",
+    "没有使用另一套技术栈",
+    "没有依赖 Figma 临时链接",
+    "registry 和 meta 能被 Agent 读取"
+  ],
+  "whenInformationIsMissing": {
+    "behavior": "不要静默猜测，继续交付确定部分，并在 component.meta.json 中写入 needsDesignConfirmation。",
+    "example": {
+      "needsDesignConfirmation": [
+        {
+          "field": "variant",
+          "value": "Type10",
+          "question": "这个变体是否为正式状态？"
+        }
+      ]
+    }
+  }
+}
